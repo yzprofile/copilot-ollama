@@ -1,0 +1,58 @@
+#+title: Readme
+
+* Use Ollama as Copilot backend
+I’ve tested almost all of the shitty solutions, this one is THE SHIT!
+
+Only models that support the “Suffix” field can optimally integrate with Copilot.
+AFAIK, currently deepseek-coder-v2, starcoder2, and qwen2.5-coder support inline completion/infill.
+
+* Launch ollama
+#+begin_src shell-script
+OLLAMA_HOST=0.0.0.0 ollama run deepseek-coder-v2
+#+end_src
+
+* Launch copilot-ollama proxy
+#+begin_src shell-script
+./copilot-ollama --listen_addr 0.0.0.0:11435 --ollama_host http://127.0.0.1:11434 --verbose
+#+end_src
+
+* Visual Studio Code
+modify copilot config in settings.json and restart
+#+begin_src json
+"github.copilot.advanced": {
+    "debug.overrideCAPIUrl": "http://127.0.0.1:11435/v1",
+    "debug.testOverrideProxyUrl": "http://127.0.0.1:11435",
+    "debug.overrideProxyUrl": "http://127.0.0.1:11435",
+    "debug.chatOverrideProxyUrl": "http://127.0.0.1:11435/v1/chat/completions"
+}
+#+end_src
+
+* Doom Emacs
+- packages.el
+
+#+begin_src emacs-lisp
+(package! copilot :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
+#+end_src
+
+- config.el
+#+begin_src emacs-lisp
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("M-f" . 'copilot-accept-completion-by-word)
+              ("M-h" . 'copilot-next-completion)
+              ("M-l" . 'copilot-previous-completion))
+  :config
+  (setq copilot-indent-offset-warning-disable t)
+  (setq copilot-max-char -1)
+  (setq copilot-idle-delay 0.1)
+  (setenv "AGENT_DEBUG_OVERRIDE_CAPI_URL" "http://127.0.0.1:11435/v1")
+  (setenv "AGENT_DEBUG_OVERRIDE_PROXY_URL" "http://127.0.0.1:11435")
+  (setenv "AGENT_DEBUG_CHAT_OVERRIDE_PROXY_URL" "http://127.0.0.1:11435")
+  (setenv "AGENT_DEBUG_USE_EDITOR_FETCHER" "true")
+  (setenv "AGENT_DEBUG_OVERRIDE_RELATED_FILES" "true")
+  (setenv "AGENT_DEBUG_OVERRIDE_ENGINE" "copilot-codex")
+)
+#+end_src
