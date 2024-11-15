@@ -8,12 +8,12 @@ AFAIK, currently deepseek-coder-v2, starcoder2, and qwen2.5-coder support inline
 
 * Launch ollama
 #+begin_src shell-script
-OLLAMA_HOST=0.0.0.0 ollama run deepseek-coder-v2
+OLLAMA_HOST=0.0.0.0 ollama serve
 #+end_src
 
 * Launch copilot-ollama proxy
 #+begin_src shell-script
-./copilot-ollama --listen_addr 0.0.0.0:11435 --ollama_host http://127.0.0.1:11434 --verbose
+./copilot-ollama --listen_addr 0.0.0.0:11435 --ollama_host http://127.0.0.1:11434 --model deepseek-coder-v2 --verbose
 #+end_src
 
 * Visual Studio Code
@@ -40,7 +40,6 @@ modify copilot config in settings.json and restart
   :hook (prog-mode . copilot-mode)
   :bind (:map copilot-completion-map
               ("<tab>" . 'copilot-accept-completion)
-              ("TAB" . 'copilot-accept-completion)
               ("M-f" . 'copilot-accept-completion-by-word)
               ("M-h" . 'copilot-next-completion)
               ("M-l" . 'copilot-previous-completion))
